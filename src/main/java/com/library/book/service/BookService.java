@@ -4,7 +4,9 @@ import com.library.book.dto.BookDTO;
 import com.library.book.entity.Book;
 import com.library.book.enums.BookStatus;
 import com.library.book.repository.BookRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,14 +33,14 @@ public class BookService {
     @Transactional(readOnly = true)
     public BookDTO getBookById(Long id) {
         Book book = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
         return convertToDTO(book);
     }
 
     @Transactional
     public BookDTO createBook(BookDTO bookDTO) {
         if (bookRepository.existsByIsbn(bookDTO.getIsbn())) {
-            throw new RuntimeException("Book with ISBN " + bookDTO.getIsbn() + " already exists");
+            throw new DataIntegrityViolationException("Book with ISBN " + bookDTO.getIsbn() + " already exists");
         }
         Book book = convertToEntity(bookDTO);
         Book savedBook = bookRepository.save(book);
@@ -48,10 +50,10 @@ public class BookService {
     @Transactional
     public BookDTO updateBook(Long id, BookDTO bookDTO) {
         Book existingBook = bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + id));
 
         if (!existingBook.getIsbn().equals(bookDTO.getIsbn()) && bookRepository.existsByIsbn(bookDTO.getIsbn())) {
-            throw new RuntimeException("Book with ISBN " + bookDTO.getIsbn() + " already exists");
+            throw new DataIntegrityViolationException("Book with ISBN " + bookDTO.getIsbn() + " already exists");
         }
 
         updateBookFields(existingBook, bookDTO);
@@ -62,7 +64,7 @@ public class BookService {
     @Transactional
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
-            throw new RuntimeException("Book not found with id: " + id);
+            throw new EntityNotFoundException("Book not found with id: " + id);
         }
         bookRepository.deleteById(id);
     }
