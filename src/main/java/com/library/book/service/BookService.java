@@ -50,6 +50,10 @@ public class BookService {
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
 
+        if (!existingBook.getIsbn().equals(bookDTO.getIsbn()) && bookRepository.existsByIsbn(bookDTO.getIsbn())) {
+            throw new RuntimeException("Book with ISBN " + bookDTO.getIsbn() + " already exists");
+        }
+
         updateBookFields(existingBook, bookDTO);
         Book updatedBook = bookRepository.save(existingBook);
         return convertToDTO(updatedBook);

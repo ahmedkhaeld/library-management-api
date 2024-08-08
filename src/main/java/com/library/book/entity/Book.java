@@ -11,7 +11,11 @@ import java.util.Objects;
 @Setter
 @Getter
 @Entity
-@Table(name = "books")
+@Table(name = "books", indexes = {
+        @Index(name = "idx_title", columnList = "title"),
+        @Index(name = "idx_author", columnList = "author"),
+        @Index(name = "idx_status", columnList = "status")
+})
 public class Book {
 
     @Id
