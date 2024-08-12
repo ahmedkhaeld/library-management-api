@@ -1,91 +1,69 @@
+# 📚 Library Management System API Documentation
 
-# Prerequisites
+## Overview
 
- - Java Development Kit (JDK): Ensure you have JDK 21
- - Docker installed
+This API provides endpoints for managing a library system, including user authentication, book management, patron management, and borrowing records. The API is organized into several controllers, each responsible for a specific domain.
 
-## application properties
-```
-# Server Configuration
-server.port=8088
+## Prerequisites
 
+- Java Development Kit (JDK): Ensure you have JDK 21
+- Docker installed
+- IDE installed (IntelliJ)
 
-# Database Configuration
-spring.datasource.url=jdbc:postgresql://localhost:5432/library
-spring.datasource.username=user
-spring.datasource.password=password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
-```
-
----
-# Steps
+## Run the Project
 
 1. Clone the repo
-2. run `docker compose up`
-3. run the project
+2. Run `docker compose up`
+3. Run the project
 
----
+## API Documentation
 
-# API Documentation
+- [Authentication Endpoints](#authentication-endpoints)
+- [Book Management Endpoints](#book-management-endpoints)
+- [Patron Management Endpoints](#patron-management-endpoints)
+- [Borrowing Records Endpoints](#borrowing-records-endpoints)
 
+## Authentication Endpoints
 
-1. **Get All Books**
-    - **URL**: `/api/books`
-        
-    - **Method**: `GET`
-        
-    - **Response**: List of books in JSON format.
+**Base URL:** `/auth`
 
-      ```
-      curl -X GET http://localhost:8080/api/books
-      ```
-        
-2. **Get Book by ID**
-    
-    - **URL**: `/api/books/{id}`
-        
-    - **Method**: `GET`
-        
-    - **Response**: Book details in JSON format.
-      ```
-      curl -X GET http://localhost:8080/api/books/1
-      ```
-        
-3. **Create Book**
-    
-    - **URL**: `/api/books`
-        
-    - **Method**: `POST`
-        
-    - **Request Body**: Book details in JSON format.
-        
-    - **Response**: Created book details in JSON format.
-      ```
-       curl -X POST http://localhost:8080/api/books -H "Content-Type: application/json" -d '{"title": "New Book", "author": "Author Name", "isbn": "1234567890", "status": "AVAILABLE"}'
-      ```
-        
-4. **Update Book**
-    
-    - **URL**: `/api/books/{id}`
-        
-    - **Method**: `PUT`
-        
-    - **Request Body**: Updated book details in JSON format.
-        
-    - **Response**: Updated book details in JSON format.
-      ```
-         curl -X PUT http://localhost:8080/api/books/1 -H "Content-Type: application/json" -d '{"title": "Updated Book", "author": "Updated Author", "isbn": "1234567890", "status": "BORROWED"}'
-      ```
-        
-5. **Delete Book**
-    
-    - **URL**: `/api/books/{id}`
-        
-    - **Method**: `DELETE`
-        
-    - **Response**: No content.
-  
-      ```
-        curl -X DELETE http://localhost:8080/api/books/1
-      ```
+| **Action** | **Method** | **Endpoint** | **Description** | **Request Body** | **Response** |
+|------------|------------|--------------|-----------------|------------------|--------------|
+| Sign Up    | `POST`     | `/signup`    | Registers a new user. | ```json { "username": "string", "password": "string", "role": "string" } ``` | ```json { "token": "token_generated" } ``` |
+| Sign In    | `POST`     | `/signin`    | Authenticates an existing user and returns a JWT token. | ```json { "username": "string", "password": "string" } ``` | ```json { "token": "token_generated" } ``` |
+
+## 📚 Book Management Endpoints
+
+**Base URL:** `/api/books`  
+**Note:** Requires Bearer Authorization Header
+
+| **Action**     | **Method** | **Endpoint** | **Description** |
+|----------------|------------|--------------|-----------------|
+| Get All Books  | `GET`      | `/`          | Retrieves a list of all books. |
+| Get Book by ID | `GET`      | `/{id}`      | Retrieves details of a specific book by its ID. |
+| Create Book    | `POST`     | `/`          | Adds a new book to the library. |
+| Update Book    | `PUT`      | `/{id}`      | Updates the details of an existing book. |
+| Delete Book    | `DELETE`   | `/{id}`      | Deletes a specific book by its ID. |
+
+## 🧑‍🤝‍🧑 Patron Management Endpoints
+
+**Base URL:** `/api/patrons`
+**Note:** Requires Bearer Authorization Header
+
+| **Action**       | **Method** | **Endpoint** | **Description** |
+|------------------|------------|--------------|-----------------|
+| Get All Patrons  | `GET`      | `/`          | Retrieves a list of all patrons. |
+| Get Patron by ID | `GET`      | `/{id}`      | Retrieves details of a specific patron by their ID. |
+| Create Patron    | `POST`     | `/`          | Adds a new patron to the library. |
+| Update Patron    | `PUT`      | `/{id}`      | Updates the details of an existing patron. |
+| Delete Patron    | `DELETE`   | `/{id}`      | Deletes a specific patron by their ID. |
+
+## 📅 Borrowing Records Endpoints
+
+**Base URL:** `/api`
+**Note:** Requires Bearer Authorization Header
+
+| **Action**   | **Method** | **Endpoint**                                       | **Description** |
+|--------------|------------|----------------------------------------------------|-----------------|
+| Borrow Book  | `POST`     | `/borrow/{bookId}/patron/{patronId}`               | Records the borrowing of a book by a patron. |
+| Return Book  | `PUT`      | `/return/{bookId}/patron/{patronId}`               | Records the return of a borrowed book by a patron. |
